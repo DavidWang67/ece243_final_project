@@ -2918,8 +2918,6 @@ int main(void){
 
 				changed_lap_1 = false;
 				changed_lap_2 = false;
-				lap_1 = 0;
-				lap_2 = 0;
 
 					//smoke
 				smoke_1 = FALSE;
@@ -2973,7 +2971,10 @@ int main(void){
 				draw_end();
 				wait_for_vsync(); // swap front and back buffers on VGA vertical sync
 				pixel_buffer_start = *(pixel_ctrl_ptr + 1);//new buffer, switch between c8 & c0
-				continue;
+				
+                lap_1 = 0;
+				lap_2 = 0;
+                continue;
 			}
 			draw_line(60, 60, 0, RESOLUTION_Y, GREY);
 			draw_line(0, 60, 210, 210, GREY);
