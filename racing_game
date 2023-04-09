@@ -129,6 +129,7 @@ bool if_z_pressed = false;
 bool if_m_pressed = false;
 bool if_start_game = false;
 bool if_end_game = false;
+bool if_skip_interrupt = false;
 struct location{
 	int x;
 	int y;
@@ -2890,6 +2891,10 @@ int main(void){
 	bool if_c8 = false;
 	bool if_cleared = false;
     while (1){
+		if(if_skip_interrupt){
+			if_skip_interrupt = false;
+			if_start_game = false;
+		}
 		if(if_start_game && !if_end_game){
 			if(changed_lap_1){
 				draw_lap_1(lap_1);
@@ -3566,8 +3571,8 @@ void PS2_ISR(void) {
 		draw_lap_2(0);
 	}
 	else if(if_end_game){
-		if_start_game = false;
 		if_end_game = false;
+		if_skip_interrupt = true;
 		 volatile int * pixel_ctrl_ptr = (int *)0xFF203020;
 		// declare other variables(not shown)
 		// initialize location and direction of rectangles(not shown)
@@ -3588,6 +3593,7 @@ void PS2_ISR(void) {
 		draw_start2();
 
 	}
+
     volatile int * PS2_ptr = (int *)PS2_BASE; 
     int PS2_data, RVALID;
     char byte1 = 0, byte2 = 0, byte3 = 0;
