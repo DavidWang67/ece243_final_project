@@ -2818,7 +2818,7 @@ unsigned short end[100][100] = {
     {0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,},
 };
 
-	int speed_1 = 7;
+	int speed_1 = 1;
 	int speed_2 = 1;
 //=============================================================================end of globals=========================================
 
@@ -2856,7 +2856,8 @@ int main(void){
     pixel_buffer_start = *(pixel_ctrl_ptr + 1); // we draw on the back buffer
     clear_screen(); // pixel_buffer_start points to the pixel buffer
 	draw_start2();
-	
+	bool red_win = false;
+	bool blue_win = false;
 	int buffer_index = 1; //index will change from 1 to 2
 	int model1_x [] = {62, 0, 0}; //current coordinate, coordinate in buffer 1, coordinate in buffer 2
 	int model2_x [] = {62, 0, 0}; //current coordinate, coordinate in buffer 1, coordinate in buffer 2
@@ -2877,7 +2878,7 @@ int main(void){
 	
 	struct location tile[5];
 	
-	tile[0].speed = rand() % 3 + 1;
+	tile[0].speed = rand() % 2 + 1;
 	for(int i = 0; i < 5; ++i){
 		tile[i].x = rand() % 40;
 		tile[i].y = 0;
@@ -2908,6 +2909,8 @@ int main(void){
 				int count = 9999999/2;
 				while(count!=0)count--;
 				
+				speed_1 = 1;
+				speed_2 = 1;
 				buffer_index = 1; //index will change from 1 to 2
 				model1_x [0] = 61; //current coordinate, coordinate in buffer 1, coordinate in buffer 2
 				model1_x [1] = 0;
@@ -2918,6 +2921,14 @@ int main(void){
 
 				changed_lap_1 = false;
 				changed_lap_2 = false;
+				
+				if(lap_1 == 3){
+					red_win = true;
+				}else{
+					blue_win = true;
+				}
+				lap_1 = 0;
+				lap_2 = 0;
 
 					//smoke
 				smoke_1 = FALSE;
@@ -2951,10 +2962,10 @@ int main(void){
 				if_end_game = true;
 				
 				clear_screen();
-				if(lap_1 == 3){
+				if(red_win){
 					draw_model1(135, 185);
 				}
-				else{
+				else if(blue_win){
 					draw_model2(135, 185);
 				}
 				draw_end();
@@ -2962,19 +2973,16 @@ int main(void){
 				pixel_buffer_start = *(pixel_ctrl_ptr + 1);//new buffer, switch between c8 & c0
 				
 				clear_screen();
-				if(lap_1 == 3){
+				if(red_win){
 					draw_model1(135, 185);
 				}
-				else{
+				else if(blue_win){
 					draw_model2(135, 185);
 				}
 				draw_end();
 				wait_for_vsync(); // swap front and back buffers on VGA vertical sync
 				pixel_buffer_start = *(pixel_ctrl_ptr + 1);//new buffer, switch between c8 & c0
-				
-                lap_1 = 0;
-				lap_2 = 0;
-                continue;
+				continue;
 			}
 			draw_line(60, 60, 0, RESOLUTION_Y, GREY);
 			draw_line(0, 60, 210, 210, GREY);
@@ -2999,13 +3007,13 @@ int main(void){
 						draw_line(tile[i].x, tile[i].x + TILE_LENGTH, tile[i].y, tile[i].y, ORANGE);
 					}
 					if(tile[i].y >= 210 && tile[i].y <= 230){
+						//code to increase speed
 						if(if_z_pressed){
 							smoke_1 = TRUE;
 							if_z_pressed = false;
 							if(speed_1 < 8){
 								speed_1 ++;
 							}
-							//code to increase speed
 						}
 						if(if_m_pressed){
 							smoke_2 = TRUE;
@@ -3019,11 +3027,11 @@ int main(void){
 					if(tile[i].y >= RESOLUTION_Y){
 						tile[i].x = rand() % 40;
 						tile[i].y = 0;
-						tile[i].speed = rand() % 3 + 1;
+						tile[i].speed = rand() % 2 + 1;
 					}
 				}else{
 					if(tile[i-1].y > (30 + rand() % 40)){
-						tile[i].speed = rand() % 3 + 1;
+						tile[i].speed = rand() % 2 + 1;
 					}
 				}
 			}
@@ -3609,9 +3617,9 @@ void PS2_ISR(void) {
 
 		//if ((byte2 == (char)0xAA) && (byte3 == (char)0x00)) // mouse inserted; initialize sending of data *(PS2_ptr) = 0xF4;
 			//*(PS2_ptr) = 0xF4;
-		if(byte3 == (char)0x1A){
+		if(byte3 == (char)0x1A && byte2 != (char)0xF0){
 			if_z_pressed = true;
-		}else if(byte3 == (char)0x3A){
+		}else if(byte3 == (char)0x3A && byte2 != (char)0xF0){
 			if_m_pressed = true;
 		}
 	}
