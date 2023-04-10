@@ -3035,13 +3035,13 @@ int main(void){
 					}
 				}
 			}
-			if(if_z_pressed){
+			if(if_z_pressed&&!smoke_1){
 				if_z_pressed = false;
 				if(speed_1 > 1){
 					speed_1 --;
 				}
 			}
-			if(if_m_pressed){
+			if(if_m_pressed&&!smoke_2){
 				if_m_pressed = false;
 				if(speed_2 > 1){
 					speed_2 --;
